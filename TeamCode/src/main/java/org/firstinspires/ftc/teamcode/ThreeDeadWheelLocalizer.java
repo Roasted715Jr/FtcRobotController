@@ -23,9 +23,9 @@ public final class ThreeDeadWheelLocalizer implements Localizer {
 //        public double par0YTicks = 1704.1709488630736; // y position of the first parallel encoder (in tick units)
 //        public double par1YTicks = -1997.0287669279812; // y position of the second parallel encoder (in tick units)
 //        public double perpXTicks = -1864.6736043531325; // x position of the perpendicular encoder (in tick units)
-        public double par0YTicks = 1671.7586307976767; // y position of the first parallel encoder (in tick units)
-        public double par1YTicks = -2033.622860197679; // y position of the second parallel encoder (in tick units)
-        public double perpXTicks = -1841.3096128528935; // x position of the perpendicular encoder (in tick units)
+        public double par0YTicks = 1646.4197393409468; // y position of the first parallel encoder (in tick units)
+        public double par1YTicks = -2059.831877612621; // y position of the second parallel encoder (in tick units)
+        public double perpXTicks = -1852.103625237557; // x position of the perpendicular encoder (in tick units)
     }
 
     public static Params PARAMS = new Params();

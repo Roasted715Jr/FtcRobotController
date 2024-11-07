@@ -29,9 +29,18 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.RR_Test_Constants.maxAccel;
+import static org.firstinspires.ftc.teamcode.RR_Test_Constants.minAccel;
+import static org.firstinspires.ftc.teamcode.RR_Test_Constants.moveSpeed;
+import static org.firstinspires.ftc.teamcode.RR_Test_Constants.turnAngle;
+import static org.firstinspires.ftc.teamcode.RR_Test_Constants.waitTime;
+
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.Arclength;
+import com.acmerobotics.roadrunner.MinMax;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Pose2dDual;
 import com.acmerobotics.roadrunner.PosePath;
@@ -49,9 +58,6 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name="RR Test", group="Linear OpMode")
 //@Disabled
 public class RR_Test extends LinearOpMode {
-    double moveSpeed = 6;
-    double turnAngle = Math.PI / 2;
-
     Pose2d initialPose = new Pose2d(0, 0, 0);
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -62,9 +68,19 @@ public class RR_Test extends LinearOpMode {
         VelConstraint velConstraint = new VelConstraint() {
             @Override
             public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
-                return 6;
+                return moveSpeed;
             }
         };
+
+        AccelConstraint accelConstraint = new AccelConstraint() {
+            @NonNull
+            @Override
+            public MinMax minMaxProfileAccel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                return new MinMax(minAccel, maxAccel);
+            }
+        };
+
+        TurnConstraints turnConstraints = new TurnConstraints(RR_Test_Constants.turnSpeed, RR_Test_Constants.minTurnAccel, RR_Test_Constants.maxTurnAccel);
 
         // Wait for the game to start (driver presses START)
         waitForStart();
@@ -72,18 +88,41 @@ public class RR_Test extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            Actions.runBlocking(
-//                    drive.actionBuilder(initialPose)
-                    drive.actionBuilder(drive.pose) //Restart from our current pose
-                            .strafeToConstantHeading(new Vector2d(48, 0), velConstraint)
-                            .waitSeconds(5)
-                            .strafeTo(new Vector2d(6, 6), velConstraint)
-                            .waitSeconds(5)
-                            .strafeTo(new Vector2d(0, 0), velConstraint)
-                            .waitSeconds(5)
-                            .turnTo(0)
-//                            .turn(turnAngle)
-                            .build());
+            if (!RR_Test_Constants.turnTest) {
+                Actions.runBlocking(
+                        drive.actionBuilder(initialPose)
+    //                    drive.actionBuilder(drive.pose) //Restart from our current pose
+                                .strafeToConstantHeading(new Vector2d(48, 0), velConstraint, accelConstraint)
+    //                            .strafeTo(new Vector2d(48, 0), velConstraint, accelConstraint)
+                                .waitSeconds(waitTime)
+                                .strafeToConstantHeading(new Vector2d(24, 24), velConstraint, accelConstraint)
+    //                            .strafeTo(new Vector2d(24, 24), velConstraint, accelConstraint)
+                                .waitSeconds(waitTime)
+                                .strafeToConstantHeading(new Vector2d(0, 0), velConstraint, accelConstraint)
+    //                            .strafeTo(new Vector2d(0, 0), velConstraint, accelConstraint)
+                                .waitSeconds(waitTime)
+                                .turnTo(0, turnConstraints)
+                                .waitSeconds(waitTime)
+    //                            .turn(turnAngle)
+                                .build());
+            } else {
+                Actions.runBlocking(
+                        drive.actionBuilder(initialPose)
+                                .turn(turnAngle, turnConstraints)
+                                .waitSeconds(waitTime)
+//                                .turnTo(Math.PI / 2, turnConstraints)
+//                                .waitSeconds(waitTime)
+//                                .turnTo(Math.PI, turnConstraints)
+//                                .waitSeconds(waitTime)
+//                                .turnTo(3 * Math.PI / 2, turnConstraints)
+//                                .waitSeconds(waitTime)
+//                                .turnTo(0, turnConstraints)
+//                                .waitSeconds(waitTime)
+                                .build());
+
+                telemetry.addData("Heading", drive.pose.heading.toDouble());
+                telemetry.update();
+            }
         }
     }
 }
